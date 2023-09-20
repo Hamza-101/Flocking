@@ -1,2 +1,2 @@
 # Flocking
-An implementation of Boid's flocking using Reynold's model.
+An implementation of Boid flocking using Reynold's model.
