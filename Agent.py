@@ -97,6 +97,62 @@ class Agent:
                 return separation_vector
         return np.zeros(2)
 
+    # def update(self, agents, dt):
+    #     positions = np.array([agent.position for agent in agents])
+    #     velocities = np.array([agent.velocity for agent in agents])
+
+    #     neighbor_indices = self.get_closest_neighbors(agents, 5.0, max_neighbors = 5)  
+    #     self.flock(neighbor_indices, positions, velocities)
+    #     self.velocity += self.acceleration * dt
+    #     self.position += self.velocity * dt
+
+    # def flock(self, neighbor_indices, positions, velocities):
+
+    #     w_alignment = 1
+    #     w_cohesion = 3  
+    #     w_separation =0
+        
+    #     alignment = self.align(neighbor_indices, velocities)
+    #     cohesion = self.cohere(neighbor_indices, positions)
+    #     separation = self.separate(neighbor_indices, positions)
+
+    #     self.acceleration = (w_alignment * alignment) + (w_cohesion * cohesion) + (w_separation * separation)
+    #     self.acceleration = np.clip(self.acceleration, 0, self.max_acceleration)
+
+    # def align(self, neighbor_indices, velocities):
+    #     if len(neighbor_indices) > 0:
+    #         neighbor_velocities = velocities[neighbor_indices] 
+    #         average_velocity = np.mean(neighbor_velocities, axis=0)
+    #         alignment = average_velocity - self.velocity
+    #         return alignment
+    #     else:
+    #         return np.zeros(2)
+
+    # def cohere(self, neighbor_indices, positions):
+    #     if len(neighbor_indices) > 0:
+    #         neighbor_positions = positions[neighbor_indices]
+    #         center_of_mass = np.mean(neighbor_positions, axis=0)
+    #         cohesion = center_of_mass - self.position
+    #         return cohesion
+    #     else:
+    #         return np.zeros(2)
+
+    # def separate(self, neighbor_indices, positions):
+    #     if len(neighbor_indices) > 0:
+    #         neighbor_positions = positions[neighbor_indices]
+    #         distances = np.linalg.norm(neighbor_positions - self.position, axis = 1)
+    #         valid_neighbors = neighbor_positions[distances > 0]
+    #         num_valid_neighbors = len(valid_neighbors)
+    #         if num_valid_neighbors > 0:
+    #             separation_vector = np.sum(valid_neighbors - self.position, axis=0) / num_valid_neighbors
+    #             separation_vector /= np.linalg.norm(separation_vector)
+    #             # print(separation_vector)
+    #             return separation_vector
+        
+    #     return np.zeros(2)
+
+
+        
     def get_closest_neighbors(self, positions, num_neighbors):
         distances = np.linalg.norm(positions - self.position, axis=1)
         sorted_indices = np.argsort(distances)
