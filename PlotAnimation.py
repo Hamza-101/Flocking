@@ -50,5 +50,5 @@ def function(i, agent_data):
 PositionsFile = Results["InitPositions"] + "\run.json"
 agent_data, max_num_points = read_data()
 anim = animation.FuncAnimation(fig, function, fargs = (agent_data,), frames = max_num_points, interval = 100, blit=False)
-anim.save(animation_filename, writer="ffmpeg")
+anim.save(rf"{Results['InitPositions']}\\{Results['Sim']}.mp4", writer="ffmpeg")
 plt.show()
