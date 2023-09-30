@@ -16,23 +16,20 @@ font = pygame.font.SysFont(None, 30)
 
 from Params import *
 
-if os.path.exists(data_file):
-        os.remove(data_file)
-
 class Agent:
 
     def __init__(self, position):
         self.position = np.array(position, dtype=float)
-        self.velocity = np.array([-(ModelParams["VelocityInit"]), ModelParams["VelocityInit"]], dtype=float)
-        self.acceleration = np.array([-(ModelParams["AccelerationInit"]), ModelParams["AccelerationInit"]], dtype=float)
-        self.max_acceleration = ModelParams["AccelerationUL"] # Maximum acceleration for the agent
-        self.max_velocity = ModelParams["VelocityUL"]  # Maximum speed for the agent
+        self.velocity = np.array([-(SimulationVariables["VelocityInit"]), SimulationVariables["VelocityInit"]], dtype=float)
+        self.acceleration = np.array([-(SimulationVariables["AccelerationInit"]), SimulationVariables["AccelerationInit"]], dtype=float)
+        self.max_acceleration = SimulationVariables["AccelerationUpperLimit"] 
+        self.max_velocity = SimulationVariables["VelocityUpperLimit"]  
 
     def update(self, agents, dt):
         positions = np.array([agent.position for agent in agents])
         velocities = np.array([agent.velocity for agent in agents])
 
-        neighbor_indices = self.get_closest_neighbors(agents, DataParams["Neighborhood"])
+        neighbor_indices = self.get_closest_neighbors(agents, SimulationVariables["NeighborhoodRadius"])
         self.flock(neighbor_indices, positions, velocities)
         self.velocity += self.acceleration * dt
 
@@ -49,9 +46,9 @@ class Agent:
         separation = self.separate(neighbor_indices, positions)
 
         total_force = (
-            ((ReynoldsParams["w_alignment"])  * alignment) +
-            ((ReynoldsParams["w_cohesion"])  * cohesion) +
-            ((ReynoldsParams["w_separation"])  * separation)
+            ((ReynoldsVariables["w_alignment"])  * alignment) +
+            ((ReynoldsVariables["w_cohesion"])  * cohesion) +
+            ((ReynoldsVariables["w_separation"])  * separation)
         )
 
         self.acceleration = np.clip(total_force, 0, self.max_acceleration)   
@@ -100,8 +97,7 @@ class Agent:
                 if distance < max_distance:
                     neighbor_indices.append(i)
 
-        return neighbor_indices
-    
+        return neighbor_indices 
  
     def draw(self):
         pygame.draw.circle(screen, WHITE, (int(self.position[0]), int(self.position[1])), 3)
@@ -111,16 +107,13 @@ class Encoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def read_agent_locations():
-    with open(file_path, "r") as f:
+    with open(rf"{Results['InitPositions']}\config.json", "r") as f:
         data = json.load(f)
         print("File loaded")
     return data
 
 def render_agents(agents, wi, he):
     timer_start = time.time()
-    total_runtime = 100
-    #sample_rate = 60 
-    sample_interval = 0.1
     time_elapsed = 0.0  
     agent_data = {id(agent) : [] for agent in agents}   
     running = True
@@ -128,22 +121,22 @@ def render_agents(agents, wi, he):
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                save_agent_data(agent_data, data_file)
+                save_agent_data(agent_data, Results['InitPositions'] + "\run.json")
                 running = False
-
-        dt = 0.1
 
         for agent in agents:
             agent_id = id(agent)
-            agent.update(agents, ModelParams["dt"])
+            agent.update(agents, (SimulationVariables["dt"]))
             
             agent_data_full = {
                 "x" : round(agent.position[0], 2), 
                 "y" : round(agent.position[1], 2)
-                }
+            }
             
-            time_elapsed += ModelParams["dt"]
-            if time_elapsed >= sample_interval:
+            time_elapsed += (SimulationVariables["dt"])
+
+            # Getting Samples
+            if time_elapsed >= (SimulationVariables["dt"]): 
                 agent_data[agent_id].append(agent_data_full)  
                 time_elapsed = 0.0
 
@@ -151,24 +144,28 @@ def render_agents(agents, wi, he):
             screen.fill(BLACK)
             for agent in agents:
                 agent.draw()
-            count_label = font.render("Number of agents: {}".format(str(num_agents)), True, WHITE)
+            count_label = font.render("Number of agents: {}".format(str(SimulationVariables["SimAgents"])), True, WHITE)
             screen.blit(count_label, (10, 10))
             
             pygame.display.flip()
 
-        if (time.time() - timer_start >= total_runtime):
+        if (time.time() - timer_start >= (SimulationVariables["Runtime"])):
             running = False
 
-    print("Episode complete")
-    save_agent_data(agent_data, data_file)
+    print("Simulation Complete")
+    save_agent_data(agent_data)
     pygame.quit()
 
-def save_agent_data(agent_data, data_file):
-    if not os.path.exists(data_file):
-        with open(data_file, "w") as f:
+def save_agent_data(agent_data):
+    if not os.path.exists(rf"{Results['InitPositions']}\run.json"):
+        with open(rf"{Results['InitPositions']}\run.json", "w") as f:
             json.dump({}, f)
 
-    with open(data_file, "r") as f:
+    if not os.path.exists(rf"{Results['InitPositions']}\settings.json"):
+        with open(rf"{Results['InitPositions']}\settings.json", "w") as f:
+            json.dumps(Results["SimDetails"], f)
+
+    with open(rf"{Results['InitPositions']}\run.json", "r") as f:
         all_data = json.load(f)
 
     for agent_id, data_list in agent_data.items():
@@ -176,8 +173,11 @@ def save_agent_data(agent_data, data_file):
             all_data[agent_id] = []
         all_data[agent_id] += data_list
 
-    with open(data_file, "w") as f:
+    with open(rf"{Results['InitPositions']}\run.json", "w") as f:
         json.dump(all_data, f, cls=Encoder)
+
+
+
 
 agent_locations = read_agent_locations()
 agents = [Agent(position) for position in agent_locations]
