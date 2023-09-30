@@ -121,7 +121,7 @@ def render_agents(agents, wi, he):
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                save_agent_data(agent_data, Results['InitPositions'] + "\run.json")
+                save_agent_data(agent_data, rf"{Results['InitPositions'] }\run.json")
                 running = False
 
         for agent in agents:
