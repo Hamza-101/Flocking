@@ -3,7 +3,7 @@ import time
 import os
 import numpy as np
 
-# Constants
+
 from Params import *
 
    
