@@ -1,9 +1,9 @@
-from Params import *
 import json
+from tqdm import tqdm
+from Params import *
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.patches import Circle
-from tqdm import tqdm
 
 fig, ax = plt.subplots()
 
