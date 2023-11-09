@@ -24,6 +24,5 @@ Results = {
     "Directory": "Simulations",
     "Sim": "Simulation",
     "InitPositions": "Simulations\Config_0",
-    "FinalPositions": "",
     "SimDetails": SimulationVariables
 }
