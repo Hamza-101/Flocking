@@ -9,7 +9,6 @@ SimulationVariables = {
     "AccelerationInit": 0.0,
     "dt" : 0.1,
     "TimeSteps": 1000,
-    "Runtime": 100,
     "X" : 10,
     "Y" : 10
 }
