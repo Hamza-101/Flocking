@@ -2,13 +2,9 @@ import json
 import time
 import os
 import numpy as np
-
-
 from Params import *
-
    
 class Agent:
-   
 
     def __init__(self, position):
         self.position = np.array(position, dtype=float)
@@ -90,8 +86,8 @@ class Agent:
         return neighbor_indices
 
 class Encoder(json.JSONEncoder):
-        def default(self, obj):
-            return json.JSONEncoder.default(self, obj)
+      def default(self, obj):
+          return json.JSONEncoder.default(self, obj)
      
 
 def read_agent_locations():
@@ -148,4 +144,3 @@ def save_agent_data(agent_data):
 agent_locations = read_agent_locations()
 agents = [Agent(position) for position in agent_locations]
 simulate_agents(agents)
-
